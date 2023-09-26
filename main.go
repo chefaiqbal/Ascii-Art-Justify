@@ -11,12 +11,19 @@ import (
 	"unsafe"
 )
 
+const (
+	leftAlign    = "left"
+	centerAlign  = "center"
+	rightAlign   = "right"
+	justifyAlign = "justify"
+)
+
 func main() {
 	var alignment, bannerType string
 	flag.StringVar(&alignment, "align", "left", "text alignment (left, center, right, justify)")
-	flag.StringVar(&bannerType, "type", "standard", "banner type (standard, shadow, tinkertoy)")
+	flag.StringVar(&bannerType, "type", "standard", "banner type (standard, shadow, thinkertoy)")
 
-	err := "\033[47mUsage: go run . [OPTION] [STRING] [BANNER] \n\nExample: go run . --align=right something standard\n\033[0m"
+	err := "Usage: go run . [OPTION] [STRING] [BANNER] \n\nExample: go run . --align=right something standard"
 
 	if len(os.Args) < 2 {
 		fmt.Println(err)
@@ -34,37 +41,23 @@ func main() {
 	userInput := args[0]
 	terminalWidth := terminalWidth()
 
-	if len(args) > 1 && (args[1] == "shadow" || args[1] == "tinkertoy") {
+	if len(args) > 1 && (args[1] == "shadow" || args[1] == "thinkertoy") {
 		bannerType = args[1]
 	}
 	ascii := mapFont(bannerType)
-
-	isASCII := func(s string) bool {
-		for _, c := range s {
-			if c > unicode.MaxASCII {
-				return false
-			}
-		}
-		return true
-	}
 
 	if !isASCII(userInput) {
 		fmt.Println("Error: input string must be within the range of ASCII characters.")
 		os.Exit(0)
 	}
 
-	words := []string{userInput}
-	if strings.Contains(words[0], "\\n") {
-		words = strings.Split(words[0], "\\n")
-	}
-
-	if alignment != "left" && alignment != "center" && alignment != "right" && alignment != "justify" {
+	if !isValidAlignment(alignment) {
 		fmt.Println("Error: alignment must be left, center, right, or justify.")
 		os.Exit(0)
 	}
 
 	alignment = strings.ToLower(alignment)
-	printOutput(words, ascii, terminalWidth, alignment)
+	printOutput(strings.Split(userInput, "\\n"), ascii, terminalWidth, alignment)
 }
 
 func mapFont(fileName string) map[rune][]string {
@@ -130,7 +123,7 @@ func printOutput(words []string, ascii map[rune][]string, terminalWidth int, ali
 		wordLength := 0
 
 		for _, runes := range word {
-			if runes == ' ' && align == "justify" {
+			if runes == ' ' && align == justifyAlign {
 				wordsPerLine++
 			}
 			wordLength = wordLength + len(ascii[runes][4])
@@ -142,11 +135,11 @@ func printOutput(words []string, ascii map[rune][]string, terminalWidth int, ali
 		}
 
 		switch align {
-		case "center":
+		case centerAlign:
 			alignment = strings.Repeat(" ", (terminalWidth-wordLength)/2)
-		case "right":
+		case rightAlign:
 			alignment = strings.Repeat(" ", terminalWidth-wordLength)
-		case "justify":
+		case justifyAlign:
 			if wordsPerLine == 0 {
 				align = "none"
 			} else {
@@ -156,10 +149,10 @@ func printOutput(words []string, ascii map[rune][]string, terminalWidth int, ali
 
 		for i := 0; i <= 8; i++ {
 			for j, runes := range word {
-				if j == 0 && align != "justify" {
+				if j == 0 && align != justifyAlign {
 					fmt.Print(alignment)
 				}
-				if align == "justify" && runes == ' ' {
+				if align == justifyAlign && runes == ' ' {
 					fmt.Print(alignment)
 				}
 				fmt.Print(ascii[runes][i])
@@ -171,4 +164,17 @@ func printOutput(words []string, ascii map[rune][]string, terminalWidth int, ali
 		}
 		wordsPerLine = 0
 	}
+}
+
+func isASCII(s string) bool {
+	for _, c := range s {
+		if c > unicode.MaxASCII {
+			return false
+		}
+	}
+	return true
+}
+
+func isValidAlignment(align string) bool {
+	return align == leftAlign || align == centerAlign || align == rightAlign || align == justifyAlign
 }
