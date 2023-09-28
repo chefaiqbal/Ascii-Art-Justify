@@ -25,10 +25,10 @@ func main() {
 
 	err := "Usage: go run . [OPTION] [STRING] [BANNER] \n\nExample: go run . --align=right something standard"
 
-	if len(os.Args) < 2 {
-		fmt.Println(err)
-		os.Exit(0)
-	}
+	// if len(os.Args) < 3 {
+	// 	fmt.Println(err)
+	// 	os.Exit(0)
+	// }
 
 	if string(os.Args[1]) == "--align" || strings.HasPrefix(string(os.Args[1]), "-align") {
 		fmt.Println(err)
@@ -36,7 +36,11 @@ func main() {
 	} else {
 		flag.Parse()
 	}
-
+	// if os.Args[0] != "--align=right"  {
+	// 	fmt.Println("Usage: go run . [OPTION] [STRING] [BANNER]")
+	// 	fmt.Println("Example: go run . --align=right something standard")
+	// 	os.Exit(1)
+	// }
 	args := flag.Args()
 	userInput := args[0]
 	terminalWidth := terminalWidth()
@@ -58,6 +62,8 @@ func main() {
 
 	alignment = strings.ToLower(alignment)
 	printOutput(strings.Split(userInput, "\\n"), ascii, terminalWidth, alignment)
+
+
 }
 
 func mapFont(fileName string) map[rune][]string {
@@ -149,7 +155,8 @@ func printOutput(words []string, ascii map[rune][]string, terminalWidth int, ali
 
 		for i := 0; i <= 8; i++ {
 			for j, runes := range word {
-				if j == 0 && align != justifyAlign {
+
+				if j == 0 && align != justifyAlign  {
 					fmt.Print(alignment)
 				}
 				if align == justifyAlign && runes == ' ' {
