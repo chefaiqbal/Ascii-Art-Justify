@@ -25,10 +25,10 @@ func main() {
 
 	err := "Usage: go run . [OPTION] [STRING] [BANNER] \n\nExample: go run . --align=right something standard"
 
-	// if len(os.Args) < 3 {
-	// 	fmt.Println(err)
-	// 	os.Exit(0)
-	// }
+	 if len(os.Args) < 3 {
+	 	fmt.Println(err)
+	 	os.Exit(0)
+	 }
 
 	if string(os.Args[1]) == "--align" || strings.HasPrefix(string(os.Args[1]), "-align") {
 		fmt.Println(err)
