@@ -25,7 +25,7 @@ func main() {
 
 	err := "Usage: go run . [OPTION] [STRING] [BANNER] \n\nExample: go run . --align=right something standard"
 
-	 if len(os.Args) < 3 {
+	 if len(os.Args) < 2 {
 	 	fmt.Println(err)
 	 	os.Exit(0)
 	 }
